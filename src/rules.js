@@ -115,7 +115,7 @@ const canPieceReach = (from, to, board) => {
     case '炮':
       return checkPao(from, to, board);
     case '兵':
-      return checkBing(from, to, board);
+      return checkBing(from, to, piece.side);
     case '象':
       return checkXiang(from, to, board);
     case '士':
