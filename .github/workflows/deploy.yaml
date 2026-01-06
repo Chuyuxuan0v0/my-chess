@@ -1,18 +1,37 @@
-steps:
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+
+# 设置权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 确保同一时间只有一个部署任务
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 第一步：安装 pnpm
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8 # 或者你本地使用的版本，比如 8
+          version: 8  # 这里可以根据你本地 pnpm -v 的结果修改
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm' # 改为缓存 pnpm
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
@@ -26,7 +45,7 @@ steps:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: './dist' # 确认你的打包输出目录是 dist
 
       - name: Deploy to GitHub Pages
         id: deployment
