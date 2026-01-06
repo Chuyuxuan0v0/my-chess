@@ -1,38 +1,24 @@
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: ["main"]  # 确认你的分支名是 main
-
-# 设置 GITHUB_TOKEN 的权限，允许部署到 GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 允许同一个时刻只有一个部署任务在运行
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
+steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # 第一步：安装 pnpm
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8 # 或者你本地使用的版本，比如 8
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'pnpm' # 改为缓存 pnpm
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build project
-        run: npm run build
+        run: pnpm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -40,7 +26,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 确保这里的路径和你打包生成的文件夹一致（Vite 默认是 dist）
           path: './dist'
 
       - name: Deploy to GitHub Pages
