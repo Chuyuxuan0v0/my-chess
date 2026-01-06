@@ -1,0 +1,294 @@
+// App.less
+@red-color: #ff4d4f;
+@black-color: #333;
+
+.turn-indicator {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+
+  &.red {
+    background-color: #ffeef0;
+    color: #ff4d4f;
+    border: 1px solid #ff4d4f;
+  }
+
+  &.black {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #333;
+  }
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  border: 2px solid #333;
+  height: 89vh;
+  width: 98vw;
+  background-color: #f0d5a0;
+  position: relative; // 确保 river 可以相对于 board 定位
+
+  // 楚河汉界
+  .river {
+    position: absolute;
+    // 关键：楚河汉界在第 5 行底部（即高度的 50% 处）
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 10%; // 占据大约一行的高度
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1; // 位于背景线条之上，棋子之下（棋子 z-index 为 1，这里可以调微调）
+    pointer-events: none; // 确保文字不会阻碍点击格子操作
+
+    span {
+      font-size: 2rem;
+      font-weight: bold;
+      color: rgba(117, 9, 9, 0.4); // 使用半透明的暗红色，显得有质感
+      font-family: 'STKaiti', 'Kaiti', serif; // 使用楷体更有古风
+    }
+  }
+
+  // 棋盘单元格
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // // 九宫格斜线逻辑
+    // // 黑方九宫格四个角 (Index 3, 5, 21, 23)
+    // // 红方九宫格四个角 (Index 66, 68, 84, 86)
+
+    // // 1. 左上到右下的斜线 (\)
+    // // 对应格：黑左上(4)、黑右下(22)、红左上(67)、红右下(85)
+    // // 注意：Index 从 1 开始算 nth-child，所以是 4, 22, 67, 85
+    // &:nth-child(4),
+    // &:nth-child(22),
+    // &:nth-child(67),
+    // &:nth-child(85) {
+    //   &::after {
+    //     content: '';
+    //     position: absolute;
+    //     width: 141%; // 勾股定理：直角边1:1，斜边约为 1.41
+    //     height: 1px;
+    //     background-color: #333;
+    //     top: 0;
+    //     left: 0;
+    //     transform: rotate(45deg);
+    //     transform-origin: top left;
+    //     z-index: 0;
+    //   }
+    // }
+
+    // // 2. 右上到左下的斜线 (/)
+    // // 对应格：黑右上(6)、黑左下(20)、红右上(69)、红左下(83)
+    // &:nth-child(6),
+    // &:nth-child(20),
+    // &:nth-child(69),
+    // &:nth-child(83) {
+    //   &::after {
+    //     content: '';
+    //     position: absolute;
+    //     width: 141%;
+    //     height: 1px;
+    //     background-color: #333;
+    //     top: 0;
+    //     right: 0;
+    //     transform: rotate(-45deg);
+    //     transform-origin: top right;
+    //     z-index: 0;
+    //   }
+    // }
+
+    // 横线
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background-color: #750909;
+      top: 50%;
+      left: 0;
+      z-index: 0; // 确保在线条下面
+    }
+
+    // 竖线
+    &::after {
+      content: '';
+      position: absolute;
+      width: 1px;
+      height: 100%;
+      background-color: #333;
+      left: 50%;
+      top: 0;
+      z-index: 0;
+    }
+
+    // 第一行：不显示上半段竖线
+    &:nth-child(-n + 9)::after {
+      height: 50%;
+      top: 50%;
+    }
+
+    // 最后一行：不显示下半段竖线
+    &:nth-child(n + 82)::after {
+      height: 50%;
+      top: 0;
+    }
+
+    // 第一列：不显示左半段横线
+    &:nth-child(9n + 1)::before {
+      width: 50%;
+      left: 50%;
+    }
+
+    // 最后一列：不显示右半段横线
+    &:nth-child(9n)::before {
+      width: 50%;
+      left: 0;
+    }
+
+    // 关键细节：去掉第 5 行和第 6 行之间的部分竖线
+    // 如果你想让楚河汉界中间没有竖线穿过：
+
+    // 处于第 5 行（index 36-44）的格子，其 after(竖线) 只显示上半截
+    &:nth-child(n + 37):nth-child(-n + 45)::after {
+      height: 50%;
+    }
+
+    // 处于第 6 行（index 46-54）的格子，其 after(竖线) 只显示下半截
+    &:nth-child(n + 46):nth-child(-n + 54)::after {
+      height: 50%;
+      top: 50%;
+    }
+
+    // 棋子
+    .piece {
+      z-index: 1; // 棋子容器要比线条层级高
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #f0d5a0;
+      user-select: none;
+      transition: all 0.2s; // 点击时平滑缩放
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // 让棋子移动时有平滑的过渡感
+
+      // 选中棋子
+      &.active {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(255, 255, 0, 0.8); // 发光效果
+        border-width: 3px;
+        z-index: 10;
+      }
+      // 红方棋子
+      &.red {
+        color: @red-color;
+        border-color: @red-color;
+      }
+      // 黑方棋子
+      &.black {
+        color: @black-color;
+        border-color: @black-color;
+      }
+
+      // 被将军警告
+      &.check-warning {
+        animation: king-flash 0.5s infinite alternate;
+        box-shadow: 0 0 20px #ff0000;
+        background-color: #ffcccc;
+      }
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75); // 遮罩加深
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px); // 背景模糊，很有现代感
+}
+
+.modal-content {
+  background: #f0d5a0;
+  padding: 40px 60px;
+  border-radius: 15px;
+  text-align: center;
+  border: 4px solid #333;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  animation: modalShow 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  h2 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-family: 'STKaiti', 'Kaiti', serif;
+  }
+
+  &.red h2 {
+    color: @red-color;
+  }
+  &.black h2 {
+    color: @black-color;
+  }
+
+  .winner-label {
+    font-size: 100px;
+    margin: 20px 0;
+    opacity: 0.9;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    &:hover {
+      background-color: #555;
+      transform: scale(1.05);
+    }
+  }
+}
+
+@keyframes modalShow {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes king-flash {
+  from {
+    border-color: #333;
+  }
+  to {
+    border-color: #ff0000;
+    transform: scale(1.1);
+  }
+}
