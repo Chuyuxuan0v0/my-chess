@@ -100,7 +100,7 @@ function App() {
         {board.map((cell, index) => (
           <div
             key={index}
-            className="cell"
+            className={`cell ${index}`}
             onClick={() => handleCellClick(index)} // 点击每个格子都调用
           >
             <Piece

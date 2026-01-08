@@ -289,7 +289,7 @@ const checkBing = (from, to, side) => {
 
   if (side === 'red') {
     // 红方向上走 (y 减小)
-    if (y2 >= y1) return false; // 不能后退或原地不动
+    if (y2 > y1) return false; // 不能后退
     if (y1 >= 5) {
       // 未过河
       return dy === -1 && dx === 0;
@@ -299,7 +299,7 @@ const checkBing = (from, to, side) => {
     }
   } else {
     // 黑方向下走 (y 增大)
-    if (y2 <= y1) return false;
+    if (y2 < y1) return false;
     if (y1 <= 4) {
       // 未过河
       return dy === 1 && dx === 0;

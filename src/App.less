@@ -27,10 +27,17 @@
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(10, 1fr);
   border: 2px solid #333;
-  height: 89vh;
-  width: 98vw;
   background-color: #f0d5a0;
   position: relative; // 确保 river 可以相对于 board 定位
+
+  // 锁定长宽比：宽9份，高10份
+  aspect-ratio: 9 / 10;
+  // width 取 90vw (视口宽度的90%) 和 80vh (视口高度的80%) 之间的最小值
+  // 这样无论横屏还是竖屏，棋盘都不会超出屏幕，且始终保持比例
+  width: min(90vw, 80vh * 0.9);
+
+  // 居中显示
+  margin: 0 auto;
 
   // 楚河汉界
   .river {
@@ -61,51 +68,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    // // 九宫格斜线逻辑
-    // // 黑方九宫格四个角 (Index 3, 5, 21, 23)
-    // // 红方九宫格四个角 (Index 66, 68, 84, 86)
-
-    // // 1. 左上到右下的斜线 (\)
-    // // 对应格：黑左上(4)、黑右下(22)、红左上(67)、红右下(85)
-    // // 注意：Index 从 1 开始算 nth-child，所以是 4, 22, 67, 85
-    // &:nth-child(4),
-    // &:nth-child(22),
-    // &:nth-child(67),
-    // &:nth-child(85) {
-    //   &::after {
-    //     content: '';
-    //     position: absolute;
-    //     width: 141%; // 勾股定理：直角边1:1，斜边约为 1.41
-    //     height: 1px;
-    //     background-color: #333;
-    //     top: 0;
-    //     left: 0;
-    //     transform: rotate(45deg);
-    //     transform-origin: top left;
-    //     z-index: 0;
-    //   }
-    // }
-
-    // // 2. 右上到左下的斜线 (/)
-    // // 对应格：黑右上(6)、黑左下(20)、红右上(69)、红左下(83)
-    // &:nth-child(6),
-    // &:nth-child(20),
-    // &:nth-child(69),
-    // &:nth-child(83) {
-    //   &::after {
-    //     content: '';
-    //     position: absolute;
-    //     width: 141%;
-    //     height: 1px;
-    //     background-color: #333;
-    //     top: 0;
-    //     right: 0;
-    //     transform: rotate(-45deg);
-    //     transform-origin: top right;
-    //     z-index: 0;
-    //   }
-    // }
+    // 确保 cell 也是等比例的
+    aspect-ratio: 1 / 1;
 
     // 横线
     &::before {
@@ -171,9 +135,19 @@
 
     // 棋子
     .piece {
-      z-index: 1; // 棋子容器要比线条层级高
-      width: 40px;
-      height: 40px;
+      box-sizing: border-box; // 往内 padding 不会改变宽度
+      z-index: 1;
+
+      // CSS 的“区间限制”函数，语法如下：clamp(MIN, VAL, MAX)
+
+      // MIN：最小值（下限）。VAL：首选值。MAX：最大值（上限）。
+
+
+      // 保证字在小屏幕不至于看不清，大屏幕不至于大得离谱
+      font-size: ~'clamp(12px, 5cqw, 28px)';
+      // 棋子本身的大小也可以用 clamp
+      width: ~'clamp(30px, 85%, 60px)';
+      height: ~'clamp(30px, 85%, 60px)';
       border-radius: 50%;
       border: 2px solid #333;
       display: flex;
@@ -183,12 +157,11 @@
       cursor: pointer;
       background-color: #f0d5a0;
       user-select: none;
-      transition: all 0.2s; // 点击时平滑缩放
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // 让棋子移动时有平滑的过渡感
+      transition: all 0.1s; // 点击时平滑缩放
+      transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1); // 让棋子移动时有平滑的过渡感
 
       // 选中棋子
       &.active {
-        transform: scale(1.1);
         box-shadow: 0 0 15px rgba(255, 255, 0, 0.8); // 发光效果
         border-width: 3px;
         z-index: 10;
