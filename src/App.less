@@ -1,6 +1,7 @@
 // App.less
 @red-color: #ff4d4f;
 @black-color: #333;
+@font-color: #fff;
 
 .turn-indicator {
   padding: 10px 20px;
@@ -23,11 +24,15 @@
 }
 
 .board {
+
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(10, 1fr);
   border: 2px solid #333;
-  background-color: #f0d5a0;
+  // background-color: #f0d5a0;
+  background-image: url('./assets/board.svg');
+  border-radius: ~'clamp(12px, 5cqw, 28px)';
+  background-size: cover;
   position: relative; // 确保 river 可以相对于 board 定位
 
   // 锁定长宽比：宽9份，高10份
@@ -119,8 +124,7 @@
       left: 0;
     }
 
-    // 关键细节：去掉第 5 行和第 6 行之间的部分竖线
-    // 如果你想让楚河汉界中间没有竖线穿过：
+    // 去掉第 5 行和第 6 行之间的部分竖线, 让楚河汉界中间没有竖线穿过
 
     // 处于第 5 行（index 36-44）的格子，其 after(竖线) 只显示上半截
     &:nth-child(n + 37):nth-child(-n + 45)::after {
@@ -133,6 +137,8 @@
       top: 50%;
     }
 
+ 
+
     // 棋子
     .piece {
       box-sizing: border-box; // 往内 padding 不会改变宽度
@@ -142,14 +148,12 @@
 
       // MIN：最小值（下限）。VAL：首选值。MAX：最大值（上限）。
 
-
       // 保证字在小屏幕不至于看不清，大屏幕不至于大得离谱
       font-size: ~'clamp(12px, 5cqw, 28px)';
       // 棋子本身的大小也可以用 clamp
       width: ~'clamp(30px, 85%, 60px)';
       height: ~'clamp(30px, 85%, 60px)';
       border-radius: 50%;
-      border: 2px solid #333;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -162,19 +166,21 @@
 
       // 选中棋子
       &.active {
-        box-shadow: 0 0 15px rgba(255, 255, 0, 0.8); // 发光效果
-        border-width: 3px;
+        box-shadow: 4px 5px 13px 1px rgb(106 106 106 / 80%);
         z-index: 10;
+        transform: scale(1.01);
       }
       // 红方棋子
       &.red {
-        color: @red-color;
-        border-color: @red-color;
+        color: @font-color;
+        background-image: url('./assets/red.svg');
+        background-size: cover;
       }
       // 黑方棋子
       &.black {
-        color: @black-color;
-        border-color: @black-color;
+        color: @font-color;
+        background-image: url('./assets/black.svg');
+        background-size: cover;
       }
 
       // 被将军警告
